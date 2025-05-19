@@ -1,5 +1,6 @@
 ## Python Titanic Sample API endpoint
 from flask import Blueprint, request, jsonify
+from model.titanic import TitanicModel # Import the TitanicModel class from the model file
 from flask_restful import Api, Resource # used for REST API building
 
 # Import the TitanicModel class from the model file
