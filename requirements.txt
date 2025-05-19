@@ -8,6 +8,7 @@ Flask_Migrate
 Flask_Restful
 Flask_Cors
 PyJWT
+scikit-learn
 pandas
 numpy
 matplotlib
