@@ -1,6 +1,7 @@
 # imports from flask
 import json
 import os
+from flask_cors import CORS
 from urllib.parse import urljoin, urlparse
 from flask import abort, redirect, render_template, request, send_from_directory, url_for, jsonify  # import render_template from "public" flask libraries
 from flask_login import current_user, login_user, logout_user
