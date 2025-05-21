@@ -27,6 +27,7 @@ from api.nestPost import nestPost_api # Justin added this, custom format for his
 from api.messages_api import messages_api # Adi added this, messages for his website
 from api.carphoto import car_api
 from api.pet import pet_api
+from api.score import score_api
 from api.carChat import car_chat_api
 from api.titanic import titanic_api # Titanic API endpoint
 
@@ -34,6 +35,7 @@ from api.vote import vote_api
 # database Initialization functions
 from model.carChat import CarChat
 from model.pet import Pet
+from model.score import Score
 from model.user import User, initUsers
 from model.section import Section, initSections
 from model.group import Group, initGroups
@@ -60,6 +62,7 @@ app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
 app.register_blueprint(pet_api)
+app.register_blueprint(score_api)
 app.register_blueprint(titanic_api) # Titanic API endpoint
 
 # Tell Flask-Login the view function name of your login route
