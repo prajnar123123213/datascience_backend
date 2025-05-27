@@ -1,92 +1,100 @@
-# movie_predictor.py
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import OneHotEncoder
+# MoviePredictor Model
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
 
 class MoviePredictor:
-    _instance = None
+    """A class for predicting whether a movie will be a Hit or Flop based on input features."""
+
+    _instance = None  # Singleton instance
 
     def __init__(self):
         self.model = None
         self.dt = None
-        self.encoder = OneHotEncoder(handle_unknown='ignore')
-        self.features = ['Budget', 'Fame', 'MemePotential']
-        self.data = self._load_data()
+        self.features = ['Genre', 'Budget', 'Fame', 'MemePotential']
+        self.movie_data = None
 
     def _load_data(self):
-        # Simulated dataset for demonstration
-        data = pd.DataFrame([
-            {'Genre': 'Action', 'Budget': 150, 'Fame': 5, 'MemePotential': 60, 'Hit': 1},
-            {'Genre': 'Comedy', 'Budget': 30, 'Fame': 3, 'MemePotential': 80, 'Hit': 1},
-            {'Genre': 'Drama', 'Budget': 10, 'Fame': 2, 'MemePotential': 10, 'Hit': 0},
-            {'Genre': 'Horror', 'Budget': 5, 'Fame': 1, 'MemePotential': 90, 'Hit': 0},
-            {'Genre': 'Sci-Fi', 'Budget': 120, 'Fame': 4, 'MemePotential': 70, 'Hit': 1},
+        # Manually constructed dummy dataset (could be replaced by real data)
+        self.movie_data = pd.DataFrame([
+            {'Genre': 'Action', 'Budget': 100, 'Fame': 5, 'MemePotential': 80, 'BoxOffice': 1},
+            {'Genre': 'Comedy', 'Budget': 30, 'Fame': 3, 'MemePotential': 60, 'BoxOffice': 1},
+            {'Genre': 'Drama', 'Budget': 10, 'Fame': 2, 'MemePotential': 20, 'BoxOffice': 0},
+            {'Genre': 'Action', 'Budget': 150, 'Fame': 4, 'MemePotential': 90, 'BoxOffice': 1},
+            {'Genre': 'Romance', 'Budget': 20, 'Fame': 1, 'MemePotential': 10, 'BoxOffice': 0},
+            {'Genre': 'Horror', 'Budget': 15, 'Fame': 2, 'MemePotential': 50, 'BoxOffice': 0},
+            {'Genre': 'Sci-Fi', 'Budget': 120, 'Fame': 4, 'MemePotential': 70, 'BoxOffice': 1},
+            {'Genre': 'Comedy', 'Budget': 25, 'Fame': 3, 'MemePotential': 65, 'BoxOffice': 1},
+            {'Genre': 'Drama', 'Budget': 8, 'Fame': 2, 'MemePotential': 15, 'BoxOffice': 0},
+            {'Genre': 'Action', 'Budget': 200, 'Fame': 5, 'MemePotential': 95, 'BoxOffice': 1}
         ])
-        return data
 
-    def _clean(self):
-        genre_encoded = self.encoder.fit_transform(self.data[['Genre']]).toarray()
-        genre_cols = ['Genre_' + g for g in self.encoder.categories_[0]]
-        genre_df = pd.DataFrame(genre_encoded, columns=genre_cols)
+        # One-hot encode the 'Genre' column
+        genre_encoded = pd.get_dummies(self.movie_data['Genre'], prefix='Genre')
+        self.movie_data = pd.concat([self.movie_data.drop('Genre', axis=1), genre_encoded], axis=1)
 
-        self.data = pd.concat([self.data, genre_df], axis=1)
-        self.data.drop(['Genre'], axis=1, inplace=True)
-        self.features.extend(genre_cols)
+        # Save the one-hot genre column names for future predictions
+        self.genre_columns = genre_encoded.columns.tolist()
 
     def _train(self):
-        X = self.data[self.features]
-        y = self.data['Hit']
-        self.model = LogisticRegression(max_iter=1000)
+        # Features and target
+        X = self.movie_data.drop('BoxOffice', axis=1)
+        y = self.movie_data['BoxOffice']
+
+        # Train logistic regression model
+        self.model = LogisticRegression()
         self.model.fit(X, y)
 
+        # Also train decision tree for feature importances
         self.dt = DecisionTreeClassifier()
         self.dt.fit(X, y)
 
+        # Save the feature list after encoding
+        self.features = X.columns.tolist()
+
     @classmethod
     def get_instance(cls):
+        """Gets or creates a singleton instance of MoviePredictor"""
         if cls._instance is None:
             cls._instance = cls()
-            cls._instance._clean()
+            cls._instance._load_data()
             cls._instance._train()
         return cls._instance
 
-    def predict(self, movie):
-        movie_df = pd.DataFrame([movie])
-        genre_encoded = self.encoder.transform(movie_df[['Genre']]).toarray()
-        genre_cols = ['Genre_' + g for g in self.encoder.categories_[0]]
-        genre_df = pd.DataFrame(genre_encoded, columns=genre_cols)
+    def predict(self, movie_input):
+        """
+        Predict if the movie will be a Hit or Flop.
+        Args:
+            movie_input (dict): Should include 'Genre', 'Budget', 'Fame', 'MemePotential'
+        Returns:
+            dict: {'result': 'Hit' or 'Flop'}
+        """
+        df = pd.DataFrame([movie_input])
 
-        movie_df = pd.concat([movie_df, genre_df], axis=1)
-        movie_df.drop(['Genre'], axis=1, inplace=True)
+        # One-hot encode Genre like training data
+        for col in self.genre_columns:
+            df[col] = 0
+        genre_col = f"Genre_{movie_input['Genre']}"
+        if genre_col in self.genre_columns:
+            df[genre_col] = 1
 
-        for col in self.features:
-            if col not in movie_df.columns:
-                movie_df[col] = 0
+        df.drop('Genre', axis=1, inplace=True)
 
-        prediction = self.model.predict(movie_df)[0]
-        return {"result": "Hit" if prediction == 1 else "Flop"}
+        # Fill in any missing columns (in case future training set changes)
+        for feature in self.features:
+            if feature not in df.columns:
+                df[feature] = 0
+
+        # Reorder columns to match training set
+        df = df[self.features]
+
+        # Predict
+        result = self.model.predict(df)[0]
+        return {'result': 'Hit' if result == 1 else 'Flop'}
 
     def feature_weights(self):
+        """Return the importance of each feature from the Decision Tree"""
         importances = self.dt.feature_importances_
-        return {feature: round(importance, 3) for feature, importance in zip(self.features, importances)}
-
-def init_movie():
-    MoviePredictor.get_instance()
-
-def test_movie():
-    movie = {
-        'Genre': 'Action',
-        'Budget': 100,
-        'Fame': 4,
-        'MemePotential': 70
-    }
-
-    predictor = MoviePredictor.get_instance()
-    print(predictor.predict(movie))
-    print(predictor.feature_weights())
-
-if __name__ == "__main__":
-    test_movie()
+        return {feature: float(f"{imp:.3f}") for feature, imp in zip(self.features, importances)}
