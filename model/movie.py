@@ -1,54 +1,92 @@
-# train_model.py
+# movie_predictor.py
 
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.pipeline import make_pipeline
-from sklearn.compose import ColumnTransformer
-import pickle
 
-np.random.seed(42)
+class MoviePredictor:
+    _instance = None
 
-# Synthetic data generation
-genres = ['Action', 'Comedy', 'Horror', 'Drama', 'Sci-Fi']
-fame_levels = [1, 2, 3, 4, 5]  # 1 = unknown actor, 5 = mega star
+    def __init__(self):
+        self.model = None
+        self.dt = None
+        self.encoder = OneHotEncoder(handle_unknown='ignore')
+        self.features = ['Budget', 'Fame', 'MemePotential']
+        self.data = self._load_data()
 
-data = []
-for _ in range(500):
-    genre = np.random.choice(genres)
-    budget = np.random.randint(1, 300)  # in millions
-    fame = np.random.choice(fame_levels)
-    meme_potential = np.random.randint(0, 101)
-    
-    # Outcome logic
-    score = (budget * 0.3) + (fame * 10) + (meme_potential * 0.6)
-    if score > 180:
-        outcome = 'Blockbuster'
-    elif score > 100:
-        outcome = 'Average'
-    else:
-        outcome = 'Flop'
-    
-    data.append([genre, budget, fame, meme_potential, outcome])
+    def _load_data(self):
+        # Simulated dataset for demonstration
+        data = pd.DataFrame([
+            {'Genre': 'Action', 'Budget': 150, 'Fame': 5, 'MemePotential': 60, 'Hit': 1},
+            {'Genre': 'Comedy', 'Budget': 30, 'Fame': 3, 'MemePotential': 80, 'Hit': 1},
+            {'Genre': 'Drama', 'Budget': 10, 'Fame': 2, 'MemePotential': 10, 'Hit': 0},
+            {'Genre': 'Horror', 'Budget': 5, 'Fame': 1, 'MemePotential': 90, 'Hit': 0},
+            {'Genre': 'Sci-Fi', 'Budget': 120, 'Fame': 4, 'MemePotential': 70, 'Hit': 1},
+        ])
+        return data
 
-# Create DataFrame
-df = pd.DataFrame(data, columns=['Genre', 'Budget', 'Fame', 'MemePotential', 'Outcome'])
+    def _clean(self):
+        genre_encoded = self.encoder.fit_transform(self.data[['Genre']]).toarray()
+        genre_cols = ['Genre_' + g for g in self.encoder.categories_[0]]
+        genre_df = pd.DataFrame(genre_encoded, columns=genre_cols)
 
-# Split X and y
-X = df[['Genre', 'Budget', 'Fame', 'MemePotential']]
-y = df['Outcome']
+        self.data = pd.concat([self.data, genre_df], axis=1)
+        self.data.drop(['Genre'], axis=1, inplace=True)
+        self.features.extend(genre_cols)
 
-# Preprocess & train
-preprocessor = ColumnTransformer(
-    transformers=[('genre', OneHotEncoder(), ['Genre'])],
-    remainder='passthrough'
-)
+    def _train(self):
+        X = self.data[self.features]
+        y = self.data['Hit']
+        self.model = LogisticRegression(max_iter=1000)
+        self.model.fit(X, y)
 
-model = make_pipeline(preprocessor, RandomForestClassifier())
-model.fit(X, y)
+        self.dt = DecisionTreeClassifier()
+        self.dt.fit(X, y)
 
-# Save model
-with open('movie_model.pkl', 'wb') as f:
-    pickle.dump(model, f)
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+            cls._instance._clean()
+            cls._instance._train()
+        return cls._instance
+
+    def predict(self, movie):
+        movie_df = pd.DataFrame([movie])
+        genre_encoded = self.encoder.transform(movie_df[['Genre']]).toarray()
+        genre_cols = ['Genre_' + g for g in self.encoder.categories_[0]]
+        genre_df = pd.DataFrame(genre_encoded, columns=genre_cols)
+
+        movie_df = pd.concat([movie_df, genre_df], axis=1)
+        movie_df.drop(['Genre'], axis=1, inplace=True)
+
+        for col in self.features:
+            if col not in movie_df.columns:
+                movie_df[col] = 0
+
+        prediction = self.model.predict(movie_df)[0]
+        return {"result": "Hit" if prediction == 1 else "Flop"}
+
+    def feature_weights(self):
+        importances = self.dt.feature_importances_
+        return {feature: round(importance, 3) for feature, importance in zip(self.features, importances)}
+
+def init_movie():
+    MoviePredictor.get_instance()
+
+def test_movie():
+    movie = {
+        'Genre': 'Action',
+        'Budget': 100,
+        'Fame': 4,
+        'MemePotential': 70
+    }
+
+    predictor = MoviePredictor.get_instance()
+    print(predictor.predict(movie))
+    print(predictor.feature_weights())
+
+if __name__ == "__main__":
+    test_movie()
