@@ -30,6 +30,7 @@ from api.pet import pet_api
 from api.score import score_api
 from api.carChat import car_chat_api
 from api.titanic import titanic_api # Titanic API endpoint
+from api.movie import movie_api # Movie API endpoint
 
 from api.vote import vote_api
 # database Initialization functions
@@ -44,6 +45,7 @@ from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
 from model.titanic import TitanicModel, initTitanic # Titanic model for prediction
+from model.movie import MovieModel, initMovies # Movie model for prediction
 # server only Views
 
 # register URIs for api endpoints
@@ -64,6 +66,7 @@ app.register_blueprint(car_api)
 app.register_blueprint(pet_api)
 app.register_blueprint(score_api)
 app.register_blueprint(titanic_api) # Titanic API endpoint
+app.register_blueprint(movie_api) # Movie API endpoint
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
