@@ -27,6 +27,7 @@ from api.nestPost import nestPost_api # Justin added this, custom format for his
 from api.messages_api import messages_api # Adi added this, messages for his website
 from api.carphoto import car_api
 from api.pet import pet_api
+from api.chart import chart_api
 from api.score import score_api
 from api.college import college_api  # College API endpoint
 from api.carChat import car_chat_api
@@ -68,6 +69,7 @@ app.register_blueprint(car_api)
 app.register_blueprint(pet_api)
 app.register_blueprint(college_api)  # College API endpoint
 app.register_blueprint(score_api)
+app.register_blueprint(chart_api)
 app.register_blueprint(titanic_api) # Titanic API endpoint
 app.register_blueprint(movie_api) # Movie API endpoint
 
