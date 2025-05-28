@@ -47,7 +47,7 @@ from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
 from model.titanic import TitanicModel, initTitanic # Titanic model for prediction
-from model.movie import MovieModel, initMovies # Movie model for prediction
+from model.movie import MoviePredictor # Movie model for prediction
 # server only Views
 
 # register URIs for api endpoints
