@@ -1,13 +1,27 @@
-# api/score.py
-
 from flask import Blueprint, request, jsonify
 import pandas as pd
-from scipy.stats import percentileofscore
 import os
+from sklearn.preprocessing import QuantileTransformer
+import numpy as np
 
 # Load the dataset
 data_path = os.path.join(os.path.dirname(__file__), 'synthetic_data_science_scores.csv')
 data = pd.read_csv(data_path)
+
+# Dynamically set n_quantiles based on number of samples
+n_samples = data.shape[0]
+n_quantiles = min(1000, n_samples)
+
+# Fit quantile transformers
+from sklearn.preprocessing import QuantileTransformer
+import numpy as np
+
+mcq_transformer = QuantileTransformer(n_quantiles=n_quantiles, output_distribution='uniform')
+frq_transformer = QuantileTransformer(n_quantiles=n_quantiles, output_distribution='uniform')
+
+mcq_transformer.fit(data[['mcq']])
+frq_transformer.fit(data[['frq']])
+
 
 # Score class definition
 class Score:
@@ -16,10 +30,12 @@ class Score:
         self.frq = frq
 
     def mcq_percentile(self):
-        return percentileofscore(data['mcq'], self.mcq, kind='rank')
+        percentile = mcq_transformer.transform([[self.mcq]])[0][0]
+        return float(np.round(percentile * 100, 2))
 
     def frq_percentile(self):
-        return percentileofscore(data['frq'], self.frq, kind='rank')
+        percentile = frq_transformer.transform([[self.frq]])[0][0]
+        return float(np.round(percentile * 100, 2))
 
 # Define the blueprint
 score_api = Blueprint('score_api', __name__)

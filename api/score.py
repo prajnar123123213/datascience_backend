@@ -1,30 +1,60 @@
 # api/score.py
 
 from flask import Blueprint, request, jsonify
+from flask_restful import Api, Resource
 import pandas as pd
-from scipy.stats import percentileofscore
+import numpy as np
 import os
+from model.score import Score
+from sklearn.preprocessing import QuantileTransformer
 
-# Define the blueprint
-score_api = Blueprint('score_api', __name__)
-
-# Load the dataset (located in the same folder as this file)
+# Load dataset
 data_path = os.path.join(os.path.dirname(__file__), 'synthetic_data_science_scores.csv')
 data = pd.read_csv(data_path)
 
-@score_api.route('/api/percentile', methods=['POST'])
-def calculate_percentile():
-    scores = request.get_json()
-    mcq_score = scores.get('mcq')
-    frq_score = scores.get('frq')
+# Prepare Quantile Transformers
+n_samples = data.shape[0]
+n_quantiles = min(1000, n_samples)
 
-    if mcq_score is None or frq_score is None:
-        return jsonify({'error': 'Missing mcq or frq scores'}), 400
+mcq_transformer = QuantileTransformer(n_quantiles=n_quantiles, output_distribution='uniform')
+frq_transformer = QuantileTransformer(n_quantiles=n_quantiles, output_distribution='uniform')
 
-    mcq_percentile = percentileofscore(data['mcq'], mcq_score, kind='rank')
-    frq_percentile = percentileofscore(data['frq'], frq_score, kind='rank')
+mcq_transformer.fit(data[['mcq']])
+frq_transformer.fit(data[['frq']])
 
-    return jsonify({
-        'mcq_percentile': mcq_percentile,
-        'frq_percentile': frq_percentile
-    })
+# Score logic class
+class Score:
+    def __init__(self, mcq, frq):
+        self.mcq = mcq
+        self.frq = frq
+
+    def mcq_percentile(self):
+        percentile = mcq_transformer.transform([[self.mcq]])[0][0]
+        return float(np.round(percentile * 100, 2))
+
+    def frq_percentile(self):
+        percentile = frq_transformer.transform([[self.frq]])[0][0]
+        return float(np.round(percentile * 100, 2))
+
+# Set up API blueprint and restful API
+score_api = Blueprint('score_api', __name__, url_prefix='/api/score')
+api = Api(score_api)
+
+# Define REST resource
+class ScoreAPI(Resource):
+    def post(self):
+        data = request.get_json()
+        mcq_score = data.get('mcq')
+        frq_score = data.get('frq')
+
+        if mcq_score is None or frq_score is None:
+            return {'error': 'Missing mcq or frq scores'}, 400
+
+        score = Score(mcq_score, frq_score)
+        return {
+            'mcq_percentile': score.mcq_percentile(),
+            'frq_percentile': score.frq_percentile()
+        }
+
+# Add resource route
+api.add_resource(ScoreAPI, '/percentile')
