@@ -1,0 +1,11 @@
+age,sex,fever,cough,shortness_of_breath,chest_pain,comorbidities,survived
+34,male,1,1,0,0,0,1
+58,female,1,1,1,1,1,0
+45,male,1,0,0,1,0,1
+70,female,1,1,1,1,1,0
+23,female,0,0,0,0,0,1
+50,male,1,1,1,0,1,1
+65,female,1,1,1,1,1,0
+28,male,0,1,0,0,0,1
+40,female,1,0,1,0,1,0
+31,male,0,0,0,0,0,1
