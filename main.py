@@ -52,6 +52,7 @@ from model.nestPost import NestPost, initNestPosts # Justin added this, custom f
 from model.vote import Vote, initVotes
 from model.titanic import TitanicModel, initTitanic # Titanic model for prediction
 from model.movie import MovieRecommender # Movie model for prediction
+from model.travel import TravelModel # Travel model for destination recommendation
 # server only Views
 
 # register URIs for api endpoints
