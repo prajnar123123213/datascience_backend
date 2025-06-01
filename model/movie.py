@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import NearestNeighbors
+from flask_restful import Resource, request
 
 class MovieRecommender:
     """A class for recommending movies based on user preferences."""
@@ -51,9 +52,16 @@ class MovieRecommender:
         Returns:
             list: List of recommended movie titles.
         """
-        # Encode user input
-        genre_code = self.movie_data['genre'].astype('category').cat.categories.get_loc(user_preferences['genre'])
-        actor_code = self.movie_data['actor'].astype('category').cat.categories.get_loc(user_preferences['actor'])
+        # Encode user input with error handling
+        try:
+            genre_code = self.movie_data['genre'].astype('category').cat.categories.get_loc(user_preferences['genre'])
+        except KeyError:
+            raise ValueError(f"Genre '{user_preferences['genre']}' not found in dataset.")
+        try:
+            actor_code = self.movie_data['actor'].astype('category').cat.categories.get_loc(user_preferences['actor'])
+        except KeyError:
+            raise ValueError(f"Actor '{user_preferences['actor']}' not found in dataset.")
+
         duration = user_preferences['duration']
 
         user_vector = np.array([[genre_code, actor_code, duration]])
@@ -86,6 +94,16 @@ def testMovie():
     print("\tRecommended movies:")
     for title in recommendations:
         print("\t -", title)
+
+class Recommend(Resource):
+    def post(self):
+        data = request.get_json()
+        model = MovieRecommender.get_instance()
+        try:
+            recommendations = model.recommend(data)
+            return {'movies': recommendations}
+        except ValueError as e:
+            return {'error': str(e)}, 400
 
 if __name__ == "__main__":
     print(" Begin:", testMovie.__doc__)

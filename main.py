@@ -34,6 +34,8 @@ from api.college import college_api  # College API endpoint
 from api.carChat import car_chat_api
 from api.titanic import titanic_api # Titanic API endpoint
 from api.movie import movie_api # Movie API endpoint
+from api.travel import travel_api  # Example API endpoint for destinations
+
 
 from api.vote import vote_api
 # database Initialization functions
@@ -74,6 +76,7 @@ app.register_blueprint(chart_api)
 app.register_blueprint(influenza_api)
 app.register_blueprint(titanic_api) # Titanic API endpoint
 app.register_blueprint(movie_api) # Movie API endpoint
+app.register_blueprint(travel_api)  # Example API endpoint for destinations
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
