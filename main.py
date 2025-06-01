@@ -27,20 +27,22 @@ from api.nestPost import nestPost_api # Justin added this, custom format for his
 from api.messages_api import messages_api # Adi added this, messages for his website
 from api.carphoto import car_api
 from api.pet import pet_api
+from api.destination import destination_api
 from api.chart import chart_api
 from api.influenza import influenza_api 
 from api.score import score_api
 from api.college import college_api  # College API endpoint
 from api.carChat import car_chat_api
 from api.titanic import titanic_api # Titanic API endpoint
-from api.movie import movie_api # Movie API endpoint
-from api.travel import travel_api  # Example API endpoint for destinations
+
+
 
 
 from api.vote import vote_api
 # database Initialization functions
 from model.carChat import CarChat
 from model.pet import Pet
+from model.destination import Destination
 from model.college import CollegePredictor# 
 from model.score import Score
 from model.user import User, initUsers
@@ -51,8 +53,8 @@ from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
 from model.titanic import TitanicModel, initTitanic # Titanic model for prediction
-from model.movie import MovieRecommender # Movie model for prediction
-from model.travel import TravelModel # Travel model for destination recommendation
+
+
 # server only Views
 
 # register URIs for api endpoints
@@ -71,13 +73,13 @@ app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
 app.register_blueprint(pet_api)
+app.register_blueprint(destination_api)
 app.register_blueprint(college_api)  # College API endpoint
 app.register_blueprint(score_api)
 app.register_blueprint(chart_api)
 app.register_blueprint(influenza_api)
 app.register_blueprint(titanic_api) # Titanic API endpoint
-app.register_blueprint(movie_api) # Movie API endpoint
-app.register_blueprint(travel_api)  # Example API endpoint for destinations
+
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
