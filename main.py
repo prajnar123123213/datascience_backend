@@ -53,8 +53,6 @@ from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
 from model.titanic import TitanicModel, initTitanic # Titanic model for prediction
-from model.titanicprediction import TitanicPrediction # Titanic prediction model
-
 
 # server only Views
 
