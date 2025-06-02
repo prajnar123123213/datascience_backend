@@ -1,36 +1,33 @@
-## Python Titanic Sample API endpoint
 from flask import Blueprint, request, jsonify
-from model.titanic import TitanicModel # Import the TitanicModel class from the model file
-from flask_restful import Api, Resource # used for REST API building
+from flask_restful import Api, Resource
+from flask_login import current_user, login_required
 
-# Import the TitanicModel class from the model file
-# from model.titanic import TitanicModel
+from __init__ import db
+from model.titanic import TitanicModel  # ML model
+from model.titanicprediction import TitanicPrediction  # SQLAlchemy DB model
 
-titanic_api = Blueprint('titanic_api', __name__,
-                   url_prefix='/api/titanic')
-
+titanic_api = Blueprint('titanic_api', __name__, url_prefix='/api/titanic')
 api = Api(titanic_api)
+
 class TitanicAPI:
     class _Predict(Resource):
-        
+        @login_required
         def post(self):
-            """ Semantics: In HTTP, POST requests are used to send data to the server for processing.
-            Sending passenger data to the server to get a prediction fits the semantics of a POST request.
-            
-            POST requests send data in the body of the request...
-            1. which can handle much larger amounts of data and data types, than URL parameters
-            2. using an HTTPS request, the data is encrypted, making it more secure
-            3. a JSON formated body is easy to read and write between JavaScript and Python, great for Postman testing
-            """     
-            # Get the passenger data from the request
             passenger = request.get_json()
 
-            # Get the singleton instance of the TitanicModel
+            # Run prediction
             titanicModel = TitanicModel.get_instance()
-            # Predict the survival probability of the passenger
             response = titanicModel.predict(passenger)
 
-            # Return the response as JSON
+            # Save prediction to DB
+            prediction = TitanicPrediction(
+                user_id=current_user.id,
+                input_data=passenger,
+                prediction_result=response
+            )
+            prediction.create()  # Save to DB
+
             return jsonify(response)
 
+    # Only add /predict, not /history
     api.add_resource(_Predict, '/predict')
