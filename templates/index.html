@@ -3,62 +3,100 @@
 
 {% block body %}
     <!-- Start of body content specific to page -->
-    <div class="px-5 py-5 mx-auto">
-        <h1 class="text-white"><strong>Python Home Page</strong></h1>
-        <div class="row">
-            <div class="col-4">
-                <div class="card">
-                    <img class="card-img-top" src="{{ url_for('static', filename='assets/python.jpeg') }}" alt="Python Development" height="250">
-                    <div class="card-body">
-                    <h5 class="card-title">What should <mark>Data Science Students learn</mark>?</h5>
-                    <p class="card-text">
-                        <ol>
-                            <li>Python is the foundation of our machine learning models and backend data workflows.</li>
-                            <li>Jupyter Notebooks are used for interactive, step-by-step ML experiments and visualizations.</li>
-                            <li>GitHub is essential for sharing, versioning, and collaborating on data science projects.</li>
-                            <li>Pandas and NumPy enable data analysis and manipulation at scale.</li>
-                            <li>scikit-learn and TensorFlow power predictive modeling and advanced ML techniques.</li>
-                        </ol>
-                    </p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="card">
-                    <img class="card-img-top" src="{{ url_for('static', filename='assets/flask.png') }}" alt="Flask Development" height="250">
-                    <div class="card-body">
-                    <h5 class="card-title">What is <mark>Flask</mark>? How do we deploy models?</h5>
-                    <p class="card-text">
-                        <ol>
-                            <li>Flask lets us turn trained ML models into deployable APIs that anyone can use.</li>
-                            <li>Our projects use Flask Blueprints to keep model logic, API routes, and UI clean and modular.</li>
-                            <li>Students build full-stack apps that allow users to input values and get model predictions.</li>
-                            <li>We use Jinja2 to connect Python logic with live HTML pages for interactive feedback.</li>
-                        </ol>
-                    </p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="card">
-                    <img class="card-img-top" src="{{ url_for('static', filename='assets/pythondb.png') }}" alt="Backend and Persistence" height="250">
-                    <div class="card-body">
-                    <h5 class="card-title">How do we manage <mark>Data & Models</mark>?</h5>
-                    <p class="card-text">
-                        <ol>
-                            <li>Students use CSV files, SQLite, and JSON to store datasets and prediction results.</li>
-                            <li>Projects often integrate SQLite with Flask for persistent storage of input/output data.</li>
-                            <li>Model files are saved with joblib or pickle and loaded into Flask apps for inference.</li>
-                            <li>We also explore NoSQL tools like MongoDB to handle flexible data formats.</li>
-                        </ol>
-                    </p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-    </div>
+    <div class="container">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Data Science Learning</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
+      background-attachment: fixed;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .myDiv {
+      border: 5px solid white;
+      background: linear-gradient(to bottom right, #d0e7ff, #82b1ff);
+      text-align: center;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 1.5s ease-in-out;
+      max-width: 80%;
+      margin: 40px auto;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .myDiv:hover {
+      transform: scale(1.03);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+    h2 {
+      color: #003366;
+      font-size: 2.8em;
+      margin-bottom: 10px;
+    }
+    .intro-text {
+      color: #0d1b2a;
+      font-size: 22px;
+      text-align: center;
+      margin: 15px auto 30px;
+      max-width: 700px;
+    }
+    .button {
+      background-color: #e0f2ff;
+      color: #0d47a1;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      display: block;
+      margin: 10px auto;
+    }
+    .button:hover {
+      background-color: #90caf9;
+      color: white;
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .image-gallery {
+      margin-top: 20px;
+    }
+    .image-gallery img {
+      margin: 10px;
+      border-radius: 10px;
+      border: 3px solid white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+    .image-gallery img:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="myDiv">
+    <h2>Data Science Learning</h2>
+    <p class="intro-text">
+      This website showcases a range of machine learning models applied in different fields such as computer vision, natural language processing, and data visualization. Each section helps students understand how data science is used in real-world scenarios through interactive examples, educational tools, and hands-on model exploration.
+    </p>
+  </div>
+</body>
+</html>
+
 {% endblock %}
