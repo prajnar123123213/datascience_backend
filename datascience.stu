@@ -1,4 +1,4 @@
-GNU nano 7.2                                                optivize.stu                                                         
+GNU nano 7.2                                                datascience.stu                                                         
 server {
     listen 80;
     listen [::]:80;
