@@ -22,7 +22,7 @@ cors = CORS(app, supports_credentials=True, origins=['http://localhost:8214', 'h
 # System Defaults
 app.config['ADMIN_USER'] = os.environ.get('ADMIN_USER') or 'admin'
 app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD') or os.environ.get('DEFAULT_PASSWORD') or 'password'
-app.config['DEFAULT_USER'] = os.environ.get('DEFAULT_USER') or 'user'
+app.config['DEFAULT_USER'] = os.environ.get('DEFA   ULT_USER') or 'user'
 app.config['DEFAULT_PASSWORD'] = os.environ.get('DEFAULT_PASSWORD') or 'password'
 
 # Browser settings
